@@ -24,14 +24,14 @@
 
             $this->load->model('UsersModel');
 
+            $filters = [];
 
+            $filters['id'] = $this->input->get('id');
 
-            $records = $this->UsersModel->getTotalUsers();
+            $records = $this->UsersModel->getTotalUsers($filters);
             $total = ceil($records/10);
 
             $page = $this->input->get('page')?($this->input->get('page')<=$total?$this->input->get('page'):$total):1;
-
-            $filters = [];
     
             $filters['page'] = $page;
             $filters['limit'] = '10';
@@ -43,7 +43,7 @@
 
             $users = [];
 
-            foreach ($this->UsersModel->getUsers() as $user) {
+            foreach ($this->UsersModel->getUsers($filters) as $user) {
                 $users[] = [
                     'id' => $user['id'],
                     'surname' => $user['surname'],

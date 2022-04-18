@@ -3,13 +3,14 @@
 	<head>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="../assets/css/style.css">
-        <link rel="stylesheet" type="text/css" media="screen" href="../assets/css/ui-lightness/jquery-ui.css" />
+        <link rel="stylesheet" type="text/css" media="screen" href="../assets/css/ui-lightness/jquery-ui.css?v=2" />
         <link rel="stylesheet" type="text/css" media="screen" href="../assets/css/ui.jqgrid.css" />
 		<title><?= $data['title'] ?></title>
 
         <script src="../assets/js/jquery-1.7.2.min.js" type="text/javascript"></script>
+        <script src="../assets/css/ui-lightness/jquery-ui.js" type="text/javascript"></script>
         <script src="../assets/src/i18n/grid.locale-en.js" type="text/javascript"></script>
-        <script src="../assets/js/jquery.jqGrid.min.js" type="text/javascript"></script>
+        <script src="../assets/js/jquery.jqGrid.src.js" type="text/javascript"></script>
         <script src="../assets/src/grid.loader.js" type="text/javascript"></script>
     </head>
 	<body>

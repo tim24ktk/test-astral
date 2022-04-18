@@ -22,14 +22,21 @@
 
             $this->load->model('UsersDiagnosesModel');
 
+            $filters = [];
+
+            $filters['id'] = $this->input->get('id');
+
+            if($this->input->get('patient')) {
+                $filters['patient'] = $this->input->get('patient');
+            }
+
             $records = $this->UsersDiagnosesModel->getTotalUsersDiagnoses();
             $total = ceil($records/10);
             $page = $this->input->get('page')?($this->input->get('page')<=$total?$this->input->get('page'):$total):1;
-
-            $filters = [];
     
             $filters['page'] = $page;
             $filters['limit'] = '10';
+
     
             $sidx = $this->input->get('sidx')?$this->input->get('sidx'):'id';
             $filters['sort_by'] = $sidx;
@@ -38,13 +45,15 @@
 
             $user_diagnoses = [];
 
-            foreach ($this->UsersDiagnosesModel->getUsersDiagnoses() as $user_diagnose) {
+            foreach ($this->UsersDiagnosesModel->getUsersDiagnoses($filters) as $user_diagnose) {
 
                 $user_diagnoses[] = [
                     'id' => $user_diagnose['id'],
                     'user_id' => $user_diagnose['user_id'],
                     'patient' => $user_diagnose['surname'] . ' ' . substr($user_diagnose['name'], 0, 1) . '. ' . substr($user_diagnose['patronymic'], 0, 1) . '.',
-                    'user_diagnose' => $user_diagnose['code'] . ' ' . $user_diagnose['description'],
+                    'code' => $user_diagnose['code'],
+                    'description' => $user_diagnose['description'],
+                    'user_diagnose' => $user_diagnose['user_diagnose'],
                     'date_opening' => $user_diagnose['date_opening'],
                     'date_closing' => $user_diagnose['date_closing']
                 ];
@@ -53,9 +62,37 @@
             echo json_encode(['rows' => $user_diagnoses, 'records' => $records, 'total' => $total, 'page' => $page]);
         }
 
+        public function updateUserDiagnose()
+        {
+            header('Content-Type: application/json');
+
+            $this->load->model('UsersDiagnosesModel');
+
+            $error = false;
+    
+            if($this->input->server('REQUEST_METHOD') === 'POST'){
+
+                $this->load->model('UsersDiagnosesModel');
+
+                $data = $this->input->post();
+
+                $diagnose_update = [
+                    'user_diagnose' => $data['user_diagnose'],
+                    'date_closing' => $data['date_closing'],
+                ];
+
+                $this->UsersDiagnosesModel->updateUserDiagnose($data['id'], $diagnose_update);
+            }
+    
+            echo json_encode(['error' => false]);
+        }
+
         public function delete()
         {
             header('Content-Type: application/json');
+
+            $this->load->model('UsersDiagnosesModel');
+
             $error = false;
     
             if($this->input->server('REQUEST_METHOD') === 'POST'){
@@ -67,5 +104,28 @@
             }
     
             echo json_encode(['error' => false]);
+        }
+
+        public function autocomplete() {
+            header('Content-Type: application/json');
+
+            $this->load->model('UsersDiagnosesModel');
+
+            $filters = [];
+
+            if($this->input->get('user_diagnose')) {
+                $filters['user_diagnose'] = $this->input->get('user_diagnose');
+            }
+
+            $diagnoses = [];
+
+            foreach ($this->UsersDiagnosesModel->getDiagnoses($filters) as $diagnose) {
+                $diagnoses[] = [
+                    'id' => $diagnose['id'],
+                    'value' => $diagnose['code'] . ' ' . $diagnose['description']
+                ];
+            }
+
+            echo json_encode($diagnoses);
         }
     }

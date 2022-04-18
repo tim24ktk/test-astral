@@ -64,3 +64,7 @@ td[dir="ltr"] {
 span.ui-icon.ui-icon-trash {
     background-color: #77d5f7;
 }
+
+td.ui-corner-all span.ui-icon {
+    background-color: #77d5f7;
+}

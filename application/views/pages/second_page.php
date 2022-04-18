@@ -24,13 +24,15 @@
                     hidden : true,
                     editable: true,
                     search:false,
-                    viewable: false
+                    viewable: false,
+                    sortable:false,
                 },
                 {
                     label : "#UID",
                     name: 'user_id', 
-                    editable: true,
-                    search:false,
+                    editable: false,
+                    search: false,
+                    sortable:false,
                     formatter:function(cellvalue, options, rowObject){
                         return '<div class="white-space-normal viewliketaga" onclick="redirect()">'+rowObject.user_id+'</div>';
                     },
@@ -39,25 +41,81 @@
                     label : "Пациент",
                     name: 'patient', 
                     editable: true,
-                    search:false,
+                    search: true,
+                    sortable:false,
                 },
                 {
                     label : "Диагноз",
                     name: 'user_diagnose', 
                     editable: true,
-                    search:false,
+                    search: false,
+                    sortable:false,
+                    edittype: 'text',
+                    editrules: {
+                        required:true,
+                        edithidden:true
+                    },
+                    formoptions:{
+                        label: 'Диагноз *',
+                    },
+                    editoptions: {
+                        dataInit : function (elem) {
+                            var elem2 = $('<input type="text" clearsearch="true" role="textbox" class="FormElement ui-widget-content ui-corner-all" placeholder="Введите диагноз">');
+                            $(elem).hide();
+                            $(elem).after(elem2);
+                            var titletext = $('#jqGrid tr[aria-selected="true"] td[aria-describedby="jqGrid_user_diagnose"]').text();
+                            $(elem).after('<div>'+titletext+'</div>');
+                            $(elem2).autocomplete({
+                                source: function(request, response) {
+                                    $.ajax( {
+                                        url: "<?= site_url('/SecondPage/autocomplete') ?>",
+                                        dataType: "json",
+                                        data: {
+                                            user_diagnose: request.term
+                                        },
+                                        success: function(data) {
+                                            response(data);
+                                        }
+                                    });
+                                },
+                                select: function(event, ui) {
+                                    $(elem).val(ui.item.id);
+                                    $('#ui-id-1 .ui-widget-content div').text(ui.item.value);
+                                    $('#TblGrid_jqGrid tr[rowpos="3"] td.DataTD div').text(ui.item.value);
+                                    setTimeout(function(){$(elem2).val('')},50);
+                                },
+                                minLength: 1
+                            });
+                        },
+                    },
+                    formatter: function(cellvalue, options, rowObject){
+                        return '<div class="white-space-normal viewliketaga">' + '#' + rowObject.user_diagnose +  ': ' + rowObject.code + ' ' + rowObject.description + '</div>';
+                    },
+                    unformat: function(cellvalue, options, cell){
+                        var temp = cellvalue.split(':');
+                        temp = temp[0].replace('#', '');
+                        return temp;
+                    },
                 },
                 {
                     label : "Дата открытия",
                     name: 'date_opening', 
-                    editable: true,
-                    search:false,
+                    editable: false,
+                    search: false,
+                    sortable:false,
                 },
                 {
                     label : "Дата закрытия",
                     name: 'date_closing', 
                     editable: true,
-                    search:false,
+                    search: false,
+                    editrules:{
+                        required:true
+                    },
+                    formoptions:{
+                        label: 'Дата закрытия *',
+                    },
+                    sortable:false,
                 },
             ],
             responsive: true,
@@ -74,32 +132,33 @@
         });
 
         $('#jqGrid').jqGrid('filterToolbar');
-        $('#jqGrid').jqGrid('navGrid',"#jqGridPager", {                
-                search: false,
+        $('#jqGrid').jqGrid('navGrid',"#jqGridPager", {    
+                edit: true,
                 add: false,
-                edit: false,
                 del: true,
                 view: false,
-                refresh: false
+                refresh: false,
+                search: false,
             },
-            {},
-            {},
             {
-                deleteCaption: "Delete patient diagnose", 
-                deletetext: "Delete patient diagnose", 
+                editCaption: "Закрыть диагноз пациента", 
+                edittext: "Закрыть диагноз пациента", 
                 closeOnEscape: true, 
                 closeAfterEdit: true, 
                 savekey: [true, 13], 
                 errorTextFormat: commonError, 
                 width: "500", 
                 reloadAfterSubmit: true, 
-                bottominfo: "Fields marked with (*) are required", 
+                bottominfo: "Поля отмеченные * обязательны к заполнению!", 
                 top: "100", 
                 left: "300", 
                 right: "300",
                 recreateForm:true,
-                url: '<?= site_url('/SecondPage/delete') ?>',
-                /*afterSubmit : function( data, postdata, oper) {
+                beforeShowForm: function ($form) {
+                    $form.find("#patient").prop("readonly", true);
+                },
+                url:'<?=site_url('/SecondPage/updateUserDiagnose')?>',
+                afterSubmit : function( data, postdata, oper) {
                     var response = data.responseJSON;
                     if (response.hasOwnProperty("error")) {
                         if(response.error.length) {
@@ -107,9 +166,33 @@
                         }
                     }
                     return [true,"",""];
-                }*/
+                },
             },
             {},
+            {
+                deleteCaption: "Удалить диагноз пациента", 
+                deletetext: "Удалить диагноз пациента", 
+                closeOnEscape: true, 
+                closeAfterEdit: true, 
+                savekey: [true, 13], 
+                errorTextFormat: commonError, 
+                width: "500", 
+                reloadAfterSubmit: true, 
+                top: "100", 
+                left: "300", 
+                right: "300",
+                recreateForm:true,
+                url: '<?= site_url('/SecondPage/delete') ?>',
+                afterSubmit : function( data, postdata, oper) {
+                    var response = data.responseJSON;
+                    if (response.hasOwnProperty("error")) {
+                        if(response.error.length) {
+                            return [false,response.error ];
+                        }
+                    }
+                    return [true,"",""];
+                }
+            },
         )
     });
 

@@ -24,7 +24,8 @@
                     hidden : true,
                     editable: false,
                     search:false,
-                    viewable: false
+                    viewable: false,
+                    sortable:false,
                 },
                 {
                     label : "Фамилия",
@@ -33,7 +34,8 @@
                     search:false,
                     editrules: {
                         required: true
-                    }
+                    },
+                    sortable:false,
                 },
                 {
                     label : "Имя",
@@ -42,7 +44,8 @@
                     search:false,
                     editrules: {
                         required: true
-                    }
+                    },
+                    sortable:false,
                 },
                 {
                     label : "Отчество",
@@ -51,7 +54,8 @@
                     search:false,
                     editrules: {
                         required: true
-                    }
+                    },
+                    sortable:false,
                 },
                 {
                     label : "Пол",
@@ -60,7 +64,8 @@
                     search:false,
                     editrules: {
                         required: true
-                    }
+                    },
+                    sortable:false,
                 },
                 {
                     label : "Дата рождения",
@@ -69,7 +74,8 @@
                     search:false,
                     editrules: {
                         required: true
-                    }                    
+                    },
+                    sortable:false,
                 },
                 {
                     label : "Дата смерти",
@@ -78,7 +84,8 @@
                     search: false,
                     editrules: {
                         required: false
-                    }
+                    },
+                    sortable:false,
                 },
             ],
             pager: "#jqGridPager",
