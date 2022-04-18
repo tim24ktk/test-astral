@@ -1,4 +1,4 @@
-        
+            </section>
         </main>
         <footer>
             <!--<h2>Footer</h2>-->

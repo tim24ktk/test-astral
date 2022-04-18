@@ -48,7 +48,7 @@
 }
 
 span.ui-jqgrid-title {
-    font-size: 25px;
+    font-size: 15px;
 }
 
 div.ui-jqgrid-sortable,
@@ -67,4 +67,8 @@ span.ui-icon.ui-icon-trash {
 
 td.ui-corner-all span.ui-icon {
     background-color: #77d5f7;
+}
+
+.user_diagnose_id {
+  display: none;
 }
