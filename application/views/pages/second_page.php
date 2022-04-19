@@ -20,7 +20,7 @@
                     label : "#ID",
                     name: 'id', 
                     key: true, 
-                    width: 75,
+                    width: 25,
                     hidden : true,
                     editable: true,
                     search:false,
@@ -31,10 +31,11 @@
                     label : "#UID",
                     name: 'user_id', 
                     editable: false,
+                    width: 25,
                     search: false,
                     sortable:false,
                     formatter:function(cellvalue, options, rowObject){
-                        return '<div class="white-space-normal viewliketaga" onclick="redirect()">'+rowObject.user_id+'</div>';
+                        return '<div class="white-space-normal viewliketaga" onclick="redirect(' + rowObject.id + ')">'+rowObject.user_id+'</div>';
                     },
                 },
                 {
@@ -43,6 +44,37 @@
                     editable: true,
                     search: true,
                     sortable:false,
+                    width: 75,
+                    searchoptions:{
+                        dataInit : function (elem) {
+                            var elem2 = $('<input type="text" role="textbox" searchopermenu="true" id="gs_patient_search" clearsearch="true" size="20" class="form-control">');
+                            $(elem).hide();
+                            $(elem).after(elem2);
+                            $(elem2).autocomplete({
+                                source: function( request, response ) {
+                                    $.ajax( {
+                                      url: "<?=site_url('/SecondPage/autocompleteUsers')?>",
+                                      dataType: "json",
+                                      data: {
+                                        user_surname: request.term
+                                      },
+                                      success: function( data ) {
+                                        response( data );
+                                      }
+                                    });
+                                },
+                                select: function( event, ui ) {
+                                    $(elem).val(ui.item.id);
+                                    $('#ui-id-1 .ui-menu-item div').text(ui.item.value);
+                                    setTimeout(function(){$(elem2).val(ui.item.value);}, 50);
+                                    var e = $.Event('keypress');
+                                    e.keyCode = 13;
+                                    $(elem).trigger(e);
+                                },
+                                minLength: 1
+                            });
+                        }
+                    },
                 },
                 {
                     label : "Диагноз",
@@ -55,6 +87,7 @@
                         required:true,
                         edithidden:true
                     },
+                    width: 150,
                     formoptions:{
                         label: 'Диагноз *',
                     },
@@ -63,8 +96,10 @@
                             var elem2 = $('<input type="text" clearsearch="true" role="textbox" class="FormElement ui-widget-content ui-corner-all" placeholder="Введите диагноз">');
                             $(elem).hide();
                             $(elem).after(elem2);
-                            var titletext = $('#jqGrid tr[aria-selected="true"] td[aria-describedby="jqGrid_user_diagnose"]').text();
-                            $(elem).after('<div>'+titletext+'</div>');
+                            var titletext = $('#jqGrid tr[aria-selected="true"] td[aria-describedby="jqGrid_user_diagnose"]').text().split(':');
+
+                            $(elem).after('<div>'+titletext[1]+'</div>');
+
                             $(elem2).autocomplete({
                                 source: function(request, response) {
                                     $.ajax( {
@@ -89,7 +124,7 @@
                         },
                     },
                     formatter: function(cellvalue, options, rowObject){
-                        return '<div class="white-space-normal viewliketaga">' + '#' + rowObject.user_diagnose +  ': ' + rowObject.code + ' ' + rowObject.description + '</div>';
+                        return '<div class="white-space-normal viewliketaga"><span class="user_diagnose_id">#' + rowObject.user_diagnose +  ': </span>' + rowObject.code + ' ' + rowObject.description + '</div>';
                     },
                     unformat: function(cellvalue, options, cell){
                         var temp = cellvalue.split(':');
@@ -103,6 +138,7 @@
                     editable: false,
                     search: false,
                     sortable:false,
+                    width: 50,
                 },
                 {
                     label : "Дата закрытия",
@@ -116,7 +152,39 @@
                         label: 'Дата закрытия *',
                     },
                     sortable:false,
+                    width: 50,
+                    editoptions: {
+                        dataInit : function (elem) {
+
+                            $.datepicker.regional['ru'] = {
+
+                                monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'],
+                                dayNamesMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
+                                dateFormat: 'yy-mm-dd',
+                                firstDay: 1,
+                                isRTL: false,
+                                showMonthAfterYear: false,
+                                yearSuffix: ''
+
+                            };
+
+                            $.datepicker.setDefaults($.datepicker.regional['ru']);
+
+                            $(function(){
+                                $("#date_closing").datepicker();
+                            });
+                        }
+                    }
                 },
+                {
+                    label: "Просмотр",
+                    name: "watch",
+                    width: 75,
+                    search: false,
+                    formatter:function(cellvalue, options, rowObject){
+                        return '<button id="watch" class="btn btn-primary" type="button" onclick="redirect(' + rowObject.id + ')">Просмотр</button>';
+                    },
+                }
             ],
             responsive: true,
             viewrecords: true,
@@ -200,7 +268,8 @@
         return "Error Occured during Operation. Please try again";
     }
 
-    function redirect() {
-        document.location.href = "<?= site_url('/ThirdPage')?>";
+    function redirect(id) {
+        document.location.href = 'ThirdPage?id=' + id;
     };
+
 </script>

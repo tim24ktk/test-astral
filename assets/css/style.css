@@ -72,3 +72,16 @@ td.ui-corner-all span.ui-icon {
 .user_diagnose_id {
   display: none;
 }
+
+.container {
+    width: 90%;
+    margin: 0 auto;
+}
+
+td[aria-describedby="jqGrid_user_id"] {
+    cursor: pointer;
+}
+
+.btn-margin {
+    margin-top: 25px;
+}

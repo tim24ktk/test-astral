@@ -51,8 +51,8 @@
                     'id' => $user_diagnose['id'],
                     'user_id' => $user_diagnose['user_id'],
                     'patient' => $user_diagnose['surname'] . ' ' . substr($user_diagnose['name'], 0, 1) . '. ' . substr($user_diagnose['patronymic'], 0, 1) . '.',
-                    'code' => $user_diagnose['code'],
-                    'description' => $user_diagnose['description'],
+                    'code' => $user_diagnose['code'] ?? '',
+                    'description' => $user_diagnose['description'] ?? '',
                     'user_diagnose' => $user_diagnose['user_diagnose'],
                     'date_opening' => $user_diagnose['date_opening'],
                     'date_closing' => $user_diagnose['date_closing']
@@ -65,8 +65,6 @@
         public function updateUserDiagnose()
         {
             header('Content-Type: application/json');
-
-            $this->load->model('UsersDiagnosesModel');
 
             $error = false;
     
@@ -128,4 +126,29 @@
 
             echo json_encode($diagnoses);
         }
+
+        public function autocompleteUsers() {
+            header('Content-Type: application/json');
+
+            $this->load->model('UsersModel');
+
+            $filters = [];
+
+            if($this->input->get('user_surname')) {
+                $filters['user_surname'] = $this->input->get('user_surname');
+            }
+
+            $users = [];
+
+            foreach ($this->UsersModel->getUsers($filters) as $user) {
+                $users[] = [
+                    'id' => $user['id'],
+                    'label' => $user['surname'] . ' ' . substr($user['name'], 0, 1) . '. ' . substr($user['patronymic'], 0, 1) . '.',
+                    'value' => $user['surname'] . ' ' . substr($user['name'], 0, 1) . '. ' . substr($user['patronymic'], 0, 1) . '.'
+                ];
+            }
+
+            echo json_encode($users);
+        }
+
     }

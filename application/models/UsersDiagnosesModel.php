@@ -6,6 +6,10 @@ class UsersDiagnosesModel extends CI_Model {
 	public function getUsersDiagnoses($data)
 	{
 		$where = [];
+
+		if (!empty($data['patient'])) {
+			$where['user_id'] = $data['patient'];
+ 		}
 	  
 		if (!empty($data['limit'])) {
 			$limit = $data['limit'];
@@ -40,6 +44,19 @@ class UsersDiagnosesModel extends CI_Model {
 		return $total['total'];
 	}
 
+	public function getUserDiagnoseById($id)
+	{
+		$where['ud.id'] = $id;
+
+		$this->db->select('ud.id, ud.user_id, u.surname, u.name, u.patronymic, d.code, d.description, ud.user_diagnose, ud.date_opening');
+		$this->db->join('users as u', 'u.id = ud.user_id', 'left');
+		$this->db->join('diagnoses as d', 'd.id = ud.user_diagnose', 'left');
+
+		$query = $this->db->get_where('users_diagnoses as ud', $where);
+
+		return $query->row_array();
+}
+
 	public function updateUserDiagnose($id, $data) {
 		$this->db->where('id', $id);
 		$this->db->update('users_diagnoses', $data);
@@ -55,12 +72,17 @@ class UsersDiagnosesModel extends CI_Model {
 		$where = [];
 
 		if(!empty($data['user_diagnose'])) {
-			$where['LOWER(code) LIKE'] = '%'.mb_strtolower($data['user_diagnose'], 'UTF-8').'%';
+			$where['LOWER(code) OR LOWER(description) LIKE'] = '%'.mb_strtolower($data['user_diagnose'], 'UTF-8').'%';
 		}
 
 		$query = $this->db->get_where('diagnoses', $where);
 
 		return $query->result_array();
+	}
+
+	public function insertUserDiagnose($data)
+	{
+		$this->db->insert('users_diagnoses', $data);
 	}
 
 }

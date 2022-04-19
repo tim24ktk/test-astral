@@ -8,6 +8,10 @@ class UsersModel extends CI_Model {
 
 		$where = [];
 
+		if(!empty($data['user_surname'])) {
+			$where['LOWER(surname) LIKE'] = '%'.mb_strtolower($data['user_surname'], 'UTF-8').'%';
+		}
+
 		if (!empty($data['limit'])) {
 			$limit = $data['limit'];
 		} else {
@@ -26,7 +30,7 @@ class UsersModel extends CI_Model {
 		
 		$query = $this->db->get_where('users', $where, $limit,  ($page-1)*$limit);
 
-        return $query->result_array();
+		return $query->result_array();
 	}
 
 	public function getTotalUsers($data)
